@@ -18,26 +18,21 @@ net1 <- netmeta(lnOR, selnOR, treat1, treat2, id,
 nc1 <- netcomb(net1)
 
 # Design Matrix M
-
 nc1$X.matrix
 
-# Question 1: hierarchy of all observed treatments in terms of median
+# All observed treatments
 set.seed(2026)
 linrank1 <- cnmaRank(nc1, set = nc1$trts, 
                      small.values = "undesirable", re = T,
-                     iter = 1000,
-                     metric = "medianrank")
+                     metric = "Pscore")
 
 linrank1
 
-forest(nc1, rightcols = c("effect", "ci","value"), 
-       rightlabs = c(NA, NA, "Median rank"),
-       add.data = linrank1[order(row.names(linrank1)),],
+forest(nc1, rightcols = c("effect", "ci"), 
        sortvar = -TE,
-       just.addcols = "right",
        backtransf = FALSE)
 
-# QUestion 2: Hierarchy of incremental effects in terms of probability of best value?
+# Hierarchy of incremental effects
 
 set.seed(2026)
 linrank2 <- cnmaRank(nc1, set = c("Face-to-face PST",
@@ -45,8 +40,7 @@ linrank2 <- cnmaRank(nc1, set = c("Face-to-face PST",
                                   "Face-to-face CBT",
                                   "SSRI"), 
                      small.values = "undesirable", re = T,
-                     iter = 1000,
-                     metric = "Pbest")
+                     metric = "Pscore")
 
 linrank2
 netcomparison(nc1, treat1 = c("Face-to-face PST",
@@ -70,35 +64,38 @@ disEx1 <- discomb(lnpfshr, selnpfshr, t1, t2, id, reference.group = "Ofa",
 # Design matrix
 M1 <- disEx1$X.matrix
 
-# Some examples using checkIdentifiable function
-checkIdentifiable(M1, v = c(1,0,0,0,0,0,0,-1))
-checkIdentifiable(M1, v = c(0,0,0,0,1,0,0,-1))
-checkIdentifiable(M1, v = c(1,0,0,0,0,-1,0,0))
+# Some examples using checkEstimable function
+checkEstimable(M1, v = c(1,0,0,0,0,0,0,-1))
+checkEstimable(M1, v = c(0,0,0,0,1,0,0,-1))
+checkEstimable(M1, v = c(1,0,0,0,0,-1,0,0))
 
-# Question 1: Hierarchy of all observed treatments in terms of their point estimates
+# All observed treatments
 disrank1 <- cnmaRank(disEx1, set = disEx1$trts, verbose = T,
                   small.values = "undesirable", re = F,
-                  metric = "pointestimate") # fails
+                  metric = "Pscore") # fails
 
-# Question 2: Hierarchy of novel targeted agent components based on the expected rank
+# Can plot it, but could be misleading!!
+forest(disEx1) 
+
+
+# Novel targeted agent components
 disrank2 <- cnmaRank(disEx1, set = c("Duv",
                                   "Ibr",
                                   "Ide",
                                   "Ubl",
                                   "Ven"), verbose = T,
                   small.values = "undesirable", re = F,
-                  metric = "expectedrank")
+                  metric = "Pscore")
 
 
-# Revised question 2: Hierarchy of subset of novel targeted agent components based on E(rank)
+# Revising - Subset of novel targeted agent components
 set.seed(2026)
 disrank2 <- cnmaRank(disEx1, set = c("Duv",
                                      "Ibr",
                                      "Ide",
                                      "Ubl"), verbose = F,
                      small.values = "undesirable", re = F,
-                     iter = 1000,
-                     metric = "expectedrank")
+                     metric = "Pscore")
 
 disrank2
 netcomparison(disEx1, treat1 = c("Duv",

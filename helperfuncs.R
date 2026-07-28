@@ -3,7 +3,7 @@
 #' @param v a numeric vector representing a contrast or treatment of interest
 #' @param verbose logical indicating if information should be printed
 #' @returns logical; TRUE if v is estimable from designMat, FALSE otherwise
-checkIdentifiable <- function(designMat, v, verbose = T) {
+checkEstimable <- function(designMat, v, verbose = T) {
   
   # check lengths
   if(ncol(designMat) != length(v)) {
@@ -139,7 +139,7 @@ cnmaRank <- function(cnet, set, small.values, re = F, verbose = F,
       
     } else {
       
-      warning(paste("There were non-identifiable contrasts.\nRerun with `verbose = TRUE` to determine non-identifiable contrasts and components.\nRanking not done.", collapse = ""))
+      warning(paste("There were contrasts that can't be uniquely identified.\nRerun with `verbose = TRUE` to determine non-estimable contrasts and components.\nRanking not done.", collapse = ""))
       
     }
     
@@ -200,64 +200,7 @@ cnmaSampRank <- function(TEmat, seTEmat, metric, iter, small.values = "desirable
     
   } else {
     
-    # Do resampling just from first column of TEmat
-    
-    samps <- mapply(rnorm, 
-                    mean = TEmat[1,], 
-                    sd = seTEmat[1,],
-                    MoreArgs = list(n = iter)) # reference is first treatment, each col is diff trt
-    
-    if(metric == "Pbest") {
-      
-      func <- ifelse(small.values == "desirable",
-                     min,
-                     max)
-      
-      sampinds <- apply(samps, 1, function(x) (x == func(x)))
-      
-      hierarchy <- apply(sampinds, 1, mean)
-
-      hranks <- rank(-hierarchy,ties.method = "average")
-      
-    } else {
-      
-      # do ranks
-      if(small.values == "desirable") {
-        
-        sampranks <- apply(samps, 1, rank)
-        
-      } else {
-        
-        sampranks <- apply(-samps, 1, rank)
-        
-      }
-      
-      if(metric == "medianrank") {
-        
-        hierarchy <- apply(sampranks, 1, median)
-        hranks <- rank(hierarchy, ties.method = "average")
-        
-      } else {
-        
-        eranks <- apply(sampranks, 1, mean)
-        
-        if(metric == "expectedrank") {
-          
-          hierarchy <- eranks
-          
-          hranks <- rank(hierarchy, ties.method = "average")
-          
-        } else if(metric == "SUCRA") {
-          
-          hierarchy <- (length(eranks) - eranks)/(length(eranks)-1)
-          hranks <- rank(-hierarchy)
-          
-        }
-        
-      }
-      
-    }
-  
+    stop("`metric` must be either Pscore or pointestimate")
   }
   
   ret <- data.frame(trt = names(hierarchy),
