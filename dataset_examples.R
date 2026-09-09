@@ -3,6 +3,8 @@ library(poth)
 library(stringr)
 source("helperfuncs.R")
 
+
+
 # Case study 1 -----------------------------
 
 data("Linde2016")
@@ -106,6 +108,23 @@ netcomparison(disEx1, treat1 = c("Duv",
 
 
 # Plotting ----------------------------------
+
+# Hypothetical data
+
+fakenet <- netmeta(TE = c(0,0,0,0),
+                   seTE = c(1,1,1,1),
+                   treat1 = c("A", "D", "D", "A"),
+                   treat2 = c("B+C", "B+C", "A+B", "E"))
+
+netgraph(fakenet,
+         points = T, cex.points = 3,
+         number.of.studies = F,
+         col.points = "skyblue2", 
+         lwd = 1,
+         main = "Example data",
+         seq = c(1,3,2,4,5))
+
+# Case study
 
 othernet <- which(disEx1$trts %in% c("Ven+Rit",
                                      "Ide+Ben+Rit",

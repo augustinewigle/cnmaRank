@@ -23,7 +23,7 @@ checkEstimable <- function(designMat, v, verbose = T) {
     print(paste0("The rank of the design matrix is ", rankX))
     print(paste0("The rank of the augmented matrix is ", rankAug))
     
-    print(paste0('The contrast represented by v is ', ifelse(estimable, "", "not "), "estimable."))
+    print(paste0('The contrast represented by v is ', ifelse(estimable, "", "not "), "uniquely estimable."))
     
   }
   
@@ -99,7 +99,7 @@ identified <- function(M, set, verbose = T, refix = 1) {
                       paste0("contrast(s) versus reference ", set[refix]), 
                       "component(s)")
     
-    message(paste0("The following ", objname, " are not uniquely identifiable:"))
+    message(paste0("The following ", objname, " are not uniquely estimable:"))
     message(paste0(set[!estimable], collapse = "\n"))
     
   }
@@ -109,7 +109,7 @@ identified <- function(M, set, verbose = T, refix = 1) {
 }
 
 # set is  a chacter vector of components or treatments - components in multicomponent treatments should be separated by a `+`
-# metric options = c("Pscore", "SUCRA", "Pbest", "medianrank", "expectedrank")
+# metric options = c("Pscore", "pointestimate")
 cnmaRank <- function(cnet, set, small.values, re = F, verbose = F,
                      metric = "Pscore", iter = 100) {
   
